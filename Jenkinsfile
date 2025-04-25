@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         VENV_DIR = 'venv'
-        FLASK_APP = 'app.py'  // Change to your Flask app entry point
+        FLASK_APP = 'app.py' // Change to your Flask app entry point
     }
 
     options {
@@ -28,21 +28,31 @@ pipeline {
             }
         }
 
+        stage('Configure flake8') {
+            steps {
+                echo 'Adding .flake8 config to exclude venv/ from linting...'
+                writeFile file: '.flake8', text: '''\
+[flake8]
+exclude = venv
+max-line-length = 120
+'''
+            }
+        }
+
         stage('Lint (flake8)') {
             steps {
                 echo 'Linting with flake8...'
-                sh './$VENV_DIR/bin/flake8 . || true' // Avoid failing the build on lint errors
+                sh './$VENV_DIR/bin/flake8 . || true' // Don't fail the build if lint issues exist
             }
         }
 
         stage('Run Tests') {
             steps {
                 echo 'Running unit tests...'
-                sh './$VENV_DIR/bin/pytest tests/' // Adjust path if needed
+                sh './$VENV_DIR/bin/pytest tests/' // Works after adding pytest to requirements
             }
         }
 
-        // Optional: Only for manual/development environments
         stage('Run Flask App') {
             when {
                 expression { return params.RUN_FLASK == true }
