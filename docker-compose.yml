@@ -1,0 +1,12 @@
+services:
+  ping-service:
+    build: ./pingservice
+    ports:
+      - "5000:5000"
+    depends_on:
+      - pong-service
+
+  pong-service:
+    build: ./pongserive
+    ports:
+      - "5001:5001"
