@@ -1,14 +1,20 @@
 version: '3.8'
 
 services:
-  ping-service:
-    build: ./pingservice
+  jenkins:
+    image: jenkins/jenkins:lts
+    container_name: jenkins
+    privileged: true
+    user: root
     ports:
-      - "5000:5000"
-    depends_on:
-      - pong-service
+      - "8080:8080"
+      - "50000:50000"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /usr/bin/docker:/usr/bin/docker
+      - /usr/local/bin/docker-compose:/usr/local/bin/docker-compose
+    restart: unless-stopped
 
-  pong-service:
-    build: ./pongservice
-    ports:
-      - "5001:5001"
+volumes:
+  jenkins_home:
